@@ -4,12 +4,12 @@
 
 **漏洞情报监控平台 - Vulnerability Intelligence Monitoring Platform**
 
-[![GitHub stars](https://img.shields.io/github/stars/yourusername/MonitorTask?style=social)](https://github.com/yourusername/MonitorTask/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/yourusername/MonitorTask?style=social)](https://github.com/yourusername/MonitorTask/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/yourusername/MonitorTask?style=social)](https://github.com/yourusername/MonitorTask/watchers)
-[![GitHub issues](https://img.shields.io/github/issues/yourusername/MonitorTask)](https://github.com/yourusername/MonitorTask/issues)
-[![GitHub pull requests](https://img.shields.io/github/issues-pr/yourusername/MonitorTask)](https://github.com/yourusername/MonitorTask/pulls)
-[![GitHub last commit](https://img.shields.io/github/last-commit/yourusername/MonitorTask)](https://github.com/yourusername/MonitorTask/commits/main)
+[![GitHub stars](https://img.shields.io/github/stars/rockmelodies/MonitorTask?style=social)](https://github.com/rockmelodies/MonitorTask/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/rockmelodies/MonitorTask?style=social)](https://github.com/rockmelodies/MonitorTask/network/members)
+[![GitHub watchers](https://img.shields.io/github/watchers/rockmelodies/MonitorTask?style=social)](https://github.com/rockmelodies/MonitorTask/watchers)
+[![GitHub issues](https://img.shields.io/github/issues/rockmelodies/MonitorTask)](https://github.com/rockmelodies/MonitorTask/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/rockmelodies/MonitorTask)](https://github.com/rockmelodies/MonitorTask/pulls)
+[![GitHub last commit](https://img.shields.io/github/last-commit/rockmelodies/MonitorTask)](https://github.com/rockmelodies/MonitorTask/commits/main)
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org)
 [![Flask](https://img.shields.io/badge/Flask-3.0.0-green.svg)](https://flask.palletsprojects.com/)
@@ -17,8 +17,8 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3.3-blue.svg)](https://www.typescriptlang.org/)
 [![Element Plus](https://img.shields.io/badge/Element_Plus-2.5.0-409eff.svg)](https://element-plus.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Code size](https://img.shields.io/github/languages/code-size/yourusername/MonitorTask)](https://github.com/yourusername/MonitorTask)
-[![GitHub release](https://img.shields.io/github/v/release/yourusername/MonitorTask)](https://github.com/yourusername/MonitorTask/releases)
+[![Code size](https://img.shields.io/github/languages/code-size/rockmelodies/MonitorTask)](https://github.com/rockmelodies/MonitorTask)
+[![GitHub release](https://img.shields.io/github/v/release/rockmelodies/MonitorTask)](https://github.com/rockmelodies/MonitorTask/releases)
 
 **专为漏洞情报分析师设计的自动化监控系统**
 
@@ -40,7 +40,7 @@
 
 ### 📈 Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=yourusername/MonitorTask&type=Date)](https://star-history.com/#yourusername/MonitorTask&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=rockmelodies/MonitorTask&type=Date)](https://star-history.com/rockmelodies/MonitorTask&Date)
 
 </div>
 
@@ -483,8 +483,8 @@ tail -f logs/monitor.log
 
 **MonitorTask Team**
 
-- 📧 Email: your-email@example.com
-- 🌐 Website: https://your-website.com
+- 📧 Email: rockysocket@gmail.com
+- 🌐 Website: https://blog.csdn.net/sinat_17584329?type=blog
 
 ---
 
