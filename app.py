@@ -20,7 +20,11 @@ app = Flask(__name__, static_folder='static')
 app.config.from_object(Config)
 
 # 初始化扩展
-CORS(app)
+CORS(app, 
+     resources={r"/api/*": {"origins": "*"}},
+     supports_credentials=True,
+     allow_headers=["Content-Type", "Authorization"],
+     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
 db.init_app(app)
 bcrypt.init_app(app)
 jwt = JWTManager(app)
@@ -36,7 +40,7 @@ def admin_required(fn):
     @wraps(fn)
     @jwt_required()
     def wrapper(*args, **kwargs):
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         user = User.query.get(current_user_id)
         if not user or user.role != 'admin':
             return jsonify({'success': False, 'message': '需要管理员权限'}), 403
@@ -49,7 +53,7 @@ def user_or_admin_required(fn):
     @wraps(fn)
     @jwt_required()
     def wrapper(*args, **kwargs):
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         user = User.query.get(current_user_id)
         if not user or user.role not in ['admin', 'user']:
             return jsonify({'success': False, 'message': '权限不足'}), 403
@@ -57,10 +61,15 @@ def user_or_admin_required(fn):
     return wrapper
 
 
-@app.route('/')
-def index():
-    """首页"""
-    return send_from_directory('static', 'index.html')
+# ==================== 健康检查 ====================
+
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    """健康检查"""
+    return jsonify({
+        'success': True,
+        'message': 'Service is running'
+    })
 
 
 # ==================== 用户认证 API ====================
@@ -129,7 +138,7 @@ def login():
         db.session.commit()
         
         # 生成 JWT token
-        access_token = create_access_token(identity=user.id)
+        access_token = create_access_token(identity=str(user.id))
         
         logger.info(f"用户登录成功: {user.username}")
         
@@ -152,7 +161,7 @@ def login():
 def get_current_user():
     """获取当前用户信息"""
     try:
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         user = User.query.get(current_user_id)
         
         if not user:
@@ -465,6 +474,7 @@ def get_all_changes():
 
 
 @app.route('/api/stats', methods=['GET'])
+@jwt_required()
 def get_stats():
     """获取统计信息"""
     try:
@@ -497,13 +507,34 @@ def get_stats():
         }), 500
 
 
-@app.route('/api/health', methods=['GET'])
-def health_check():
-    """健康检查"""
-    return jsonify({
-        'success': True,
-        'message': 'Service is running'
-    })
+# ==================== 静态文件服务 ====================
+# 必须放在最后,避免拦截API路由
+
+@app.route('/')
+def index():
+    """首页"""
+    return send_from_directory(app.static_folder, 'index.html')
+
+
+@app.route('/assets/<path:filename>')
+def assets(filename):
+    """静态资源"""
+    return send_from_directory(os.path.join(app.static_folder, 'assets'), filename)
+
+
+@app.route('/<path:filename>')
+def static_files(filename):
+    """其他静态文件"""
+    # 排除API路由
+    if filename.startswith('api/'):
+        return jsonify({'error': 'Not found'}), 404
+    
+    file_path = os.path.join(app.static_folder, filename)
+    if os.path.exists(file_path) and os.path.isfile(file_path):
+        return send_from_directory(app.static_folder, filename)
+    else:
+        # SPA路由,返回index.html
+        return send_from_directory(app.static_folder, 'index.html')
 
 
 # 初始化数据库
