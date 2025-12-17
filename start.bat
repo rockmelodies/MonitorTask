@@ -1,61 +1,98 @@
 @echo off
-chcp 65001 >nul
+REM MonitorTask Startup Script
+REM Set UTF-8 encoding
+chcp 65001 >nul 2>&1
+
 echo ====================================
-echo   MonitorTask 漏洞情报监控平台
+echo   MonitorTask Startup
 echo ====================================
 echo.
 
-echo [1/4] 检查Python环境...
+REM Check Python
+echo [1/5] Checking Python...
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
-    echo ❌ Python未安装或未配置到PATH
-    echo 请先安装Python 3.8+
+    echo [ERROR] Python not found!
+    echo Please install Python 3.8+
     pause
     exit /b 1
 )
-echo ✅ Python环境正常
+echo [OK] Python installed
 
+REM Check virtual environment
 echo.
-echo [2/4] 检查虚拟环境...
-if not exist "venv" (
-    echo 创建虚拟环境...
-    python -m venv venv
-    echo ✅ 虚拟环境创建成功
+echo [2/5] Checking virtual environment...
+if not exist ".venv" (
+    if not exist "venv" (
+        echo Creating virtual environment...
+        python -m venv .venv
+        echo [OK] Virtual environment created
+    ) else (
+        echo [OK] Using existing venv folder
+    )
 ) else (
-    echo ✅ 虚拟环境已存在
+    echo [OK] Virtual environment exists
 )
 
+REM Activate virtual environment
 echo.
-echo [3/4] 激活虚拟环境并安装依赖...
-call venv\Scripts\activate.bat
-pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-if %errorlevel% neq 0 (
-    echo ❌ 依赖安装失败
+echo [3/5] Activating virtual environment...
+if exist ".venv\Scripts\activate.bat" (
+    call .venv\Scripts\activate.bat
+) else if exist "venv\Scripts\activate.bat" (
+    call venv\Scripts\activate.bat
+) else (
+    echo [ERROR] Cannot find activate script
     pause
     exit /b 1
 )
-echo ✅ 依赖安装完成
+echo [OK] Virtual environment activated
 
+REM Install dependencies
 echo.
-echo [4/4] 检查配置文件...
-if not exist ".env" (
-    echo 复制配置文件...
-    copy .env.example .env
-    echo ⚠️  请编辑 .env 文件配置相关参数
+echo [4/5] Installing dependencies...
+echo This may take a few minutes...
+pip install -q -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+if %errorlevel% neq 0 (
+    echo [ERROR] Failed to install dependencies
+    echo Trying without mirror...
+    pip install -r requirements.txt
+    if %errorlevel% neq 0 (
+        pause
+        exit /b 1
+    )
 )
+echo [OK] Dependencies installed
 
+REM Check config
+echo.
+echo [5/5] Checking configuration...
+if not exist ".env" (
+    echo Creating .env from template...
+    copy .env.example .env >nul
+    echo [WARNING] Please edit .env file for configuration
+)
+echo [OK] Configuration ready
+
+REM Start service
 echo.
 echo ====================================
-echo   启动MonitorTask服务
+echo   Starting MonitorTask Service
 echo ====================================
 echo.
-echo 🚀 服务启动中...
-echo 📡 后端API: http://localhost:5000
+echo Backend API: http://localhost:5000
 echo.
-echo 按 Ctrl+C 停止服务
+echo Press Ctrl+C to stop
 echo ====================================
 echo.
 
 python run.py
+
+if %errorlevel% neq 0 (
+    echo.
+    echo [ERROR] Service failed to start
+    echo Check the error message above
+    pause
+)
 
 pause

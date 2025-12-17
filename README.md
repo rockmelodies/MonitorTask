@@ -80,6 +80,29 @@
 
 ### 后端部署
 
+#### 方法一: 一键启动(推荐)
+
+**Windows用户:**
+```bash
+# 双击运行或命令行执行
+start.bat
+```
+
+**Linux/Mac用户:**
+```bash
+chmod +x start.sh
+./start.sh
+```
+
+脚本会自动:
+- ✅ 检查Python环境
+- ✅ 创建/激活虚拟环境(.venv)
+- ✅ 安装依赖包
+- ✅ 创建配置文件
+- ✅ 启动服务
+
+#### 方法二: 手动部署
+
 #### 1. 克隆项目
 
 ```bash
@@ -102,8 +125,19 @@ source venv/bin/activate
 #### 3. 安装依赖
 
 ```bash
+# 使用国内镜像加速(推荐)
+pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+# 或者使用官方源
 pip install -r requirements.txt
 ```
+
+**重要依赖说明:**
+- `Flask-JWT-Extended`: JWT认证
+- `Flask-Bcrypt`: 密码加密
+- `APScheduler`: 任务调度
+- `BeautifulSoup4`: HTML解析
+- `requests`: HTTP请求
 
 #### 4. 配置环境变量
 

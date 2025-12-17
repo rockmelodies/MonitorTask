@@ -1,56 +1,89 @@
 #!/bin/bash
+# MonitorTask Startup Script
 
 echo "===================================="
-echo "  MonitorTask 漏洞情报监控平台"
+echo "  MonitorTask Startup"
 echo "===================================="
 echo ""
 
-echo "[1/4] 检查Python环境..."
+# Check Python
+echo "[1/5] Checking Python..."
 if ! command -v python3 &> /dev/null; then
-    echo "❌ Python3未安装"
-    echo "请先安装Python 3.8+"
+    echo "[ERROR] Python3 not found"
+    echo "Please install Python 3.8+"
     exit 1
 fi
-echo "✅ Python环境正常"
+echo "[OK] Python installed"
 
+# Check virtual environment
 echo ""
-echo "[2/4] 检查虚拟环境..."
-if [ ! -d "venv" ]; then
-    echo "创建虚拟环境..."
-    python3 -m venv venv
-    echo "✅ 虚拟环境创建成功"
+echo "[2/5] Checking virtual environment..."
+if [ ! -d ".venv" ]; then
+    if [ ! -d "venv" ]; then
+        echo "Creating virtual environment..."
+        python3 -m venv .venv
+        echo "[OK] Virtual environment created"
+    else
+        echo "[OK] Using existing venv folder"
+    fi
 else
-    echo "✅ 虚拟环境已存在"
+    echo "[OK] Virtual environment exists"
 fi
 
+# Activate virtual environment
 echo ""
-echo "[3/4] 激活虚拟环境并安装依赖..."
-source venv/bin/activate
-pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-if [ $? -ne 0 ]; then
-    echo "❌ 依赖安装失败"
+echo "[3/5] Activating virtual environment..."
+if [ -f ".venv/bin/activate" ]; then
+    source .venv/bin/activate
+elif [ -f "venv/bin/activate" ]; then
+    source venv/bin/activate
+else
+    echo "[ERROR] Cannot find activate script"
     exit 1
 fi
-echo "✅ 依赖安装完成"
+echo "[OK] Virtual environment activated"
 
+# Install dependencies
 echo ""
-echo "[4/4] 检查配置文件..."
-if [ ! -f ".env" ]; then
-    echo "复制配置文件..."
-    cp .env.example .env
-    echo "⚠️  请编辑 .env 文件配置相关参数"
+echo "[4/5] Installing dependencies..."
+echo "This may take a few minutes..."
+pip install -q -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+if [ $? -ne 0 ]; then
+    echo "[ERROR] Failed to install dependencies"
+    echo "Trying without mirror..."
+    pip install -r requirements.txt
+    if [ $? -ne 0 ]; then
+        exit 1
+    fi
 fi
+echo "[OK] Dependencies installed"
 
+# Check config
+echo ""
+echo "[5/5] Checking configuration..."
+if [ ! -f ".env" ]; then
+    echo "Creating .env from template..."
+    cp .env.example .env
+    echo "[WARNING] Please edit .env file for configuration"
+fi
+echo "[OK] Configuration ready"
+
+# Start service
 echo ""
 echo "===================================="
-echo "  启动MonitorTask服务"
+echo "  Starting MonitorTask Service"
 echo "===================================="
 echo ""
-echo "🚀 服务启动中..."
-echo "📡 后端API: http://localhost:5000"
+echo "Backend API: http://localhost:5000"
 echo ""
-echo "按 Ctrl+C 停止服务"
+echo "Press Ctrl+C to stop"
 echo "===================================="
 echo ""
 
 python run.py
+
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "[ERROR] Service failed to start"
+    echo "Check the error message above"
+fi
