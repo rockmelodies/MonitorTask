@@ -147,19 +147,61 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-编辑 `.env` 文件:
+编辑 `.env` 文件,**必须修改以下配置**:
 
 ```ini
 # 数据库配置
 DATABASE_URL=sqlite:///monitor.db
 
 # Flask配置
-SECRET_KEY=your-secret-key-here
-JWT_SECRET_KEY=your-jwt-secret-key
+FLASK_ENV=development  # 开发环境: development, 生产环境: production
+SECRET_KEY=your-secret-key-here  # ⚠️ 必须修改为随机字符串
+JWT_SECRET_KEY=your-jwt-secret-key  # ⚠️ 必须修改为随机字符串
 
 # 钉钉配置(可选)
-DEFAULT_DINGTALK_WEBHOOK=https://oapi.dingtalk.com/robot/...
+DEFAULT_DINGTALK_WEBHOOK=https://oapi.dingtalk.com/robot/send?access_token=xxx
+
+# 监控配置
+DEFAULT_CHECK_INTERVAL=300  # 默认检查间隔(秒)
+MAX_CONCURRENT_TASKS=100     # 最大并发任务数
+REQUEST_TIMEOUT=30           # 请求超时时间(秒)
 ```
+
+**⚠️ 安全提示:**
+
+1. **SECRET_KEY 和 JWT_SECRET_KEY 必须修改!**
+2. 生产环境必须使用强随机密钥
+3. 不要将 `.env` 文件提交到Git仓库
+
+**生成安全密钥的方法:**
+
+```bash
+# Python方式生成随机密钥
+python -c "import secrets; print(secrets.token_hex(32))"
+
+# 输出示例:
+# a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2
+```
+
+将生成的密钥分别填入 `SECRET_KEY` 和 `JWT_SECRET_KEY`:
+
+```ini
+SECRET_KEY=a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2
+JWT_SECRET_KEY=f2e1d0c9b8a7z6y5x4w3v2u1t0s9r8q7p6o5n4m3l2k1j0i9h8g7f6e5d4c3b2a1
+```
+
+**环境变量说明:**
+
+| 变量 | 说明 | 示例值 | 必填 |
+|------|------|--------|------|
+| `DATABASE_URL` | 数据库连接字符串 | `sqlite:///monitor.db` | 是 |
+| `FLASK_ENV` | Flask运行环境 | `development` / `production` | 是 |
+| `SECRET_KEY` | Flask会话密钥 | 随机字符串(64位) | **是** |
+| `JWT_SECRET_KEY` | JWT加密密钥 | 随机字符串(64位) | **是** |
+| `DEFAULT_DINGTALK_WEBHOOK` | 默认钉钉机器人地址 | `https://oapi.dingtalk.com/...` | 否 |
+| `DEFAULT_CHECK_INTERVAL` | 默认检查间隔(秒) | `300` | 否 |
+| `MAX_CONCURRENT_TASKS` | 最大并发任务数 | `100` | 否 |
+| `REQUEST_TIMEOUT` | HTTP请求超时(秒) | `30` | 否 |
 
 #### 5. 启动后端服务
 
