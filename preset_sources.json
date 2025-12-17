@@ -1,0 +1,83 @@
+[
+  {
+    "name": "CNVD - 国家信息安全漏洞共享平台",
+    "url": "https://www.cnvd.org.cn/flaw/list",
+    "check_interval": 300,
+    "selector": ".blkContainer tbody tr",
+    "keywords": ["高危", "紧急", "严重", "CVE-"],
+    "priority": "high",
+    "tags": ["国内官方", "漏洞库"]
+  },
+  {
+    "name": "CNNVD - 国家信息安全漏洞库",
+    "url": "http://www.cnnvd.org.cn/web/xxk/bdxqById.tag",
+    "check_interval": 300,
+    "keywords": ["高危", "严重", "CVE-"],
+    "priority": "high",
+    "tags": ["国内官方", "漏洞库"]
+  },
+  {
+    "name": "奇安信威胁情报中心",
+    "url": "https://ti.qianxin.com/vulnerability",
+    "check_interval": 600,
+    "keywords": ["高危", "0day", "在野利用"],
+    "priority": "high",
+    "tags": ["安全厂商", "威胁情报"]
+  },
+  {
+    "name": "阿里云安全公告",
+    "url": "https://help.aliyun.com/noticelist/9213612.html",
+    "check_interval": 600,
+    "keywords": ["紧急", "高危", "重要"],
+    "priority": "medium",
+    "tags": ["云厂商", "安全公告"]
+  },
+  {
+    "name": "NVD - 国家漏洞数据库",
+    "url": "https://nvd.nist.gov/vuln/search/results",
+    "check_interval": 600,
+    "keywords": ["CVE-", "CRITICAL", "HIGH"],
+    "priority": "high",
+    "tags": ["国际权威", "漏洞库"]
+  },
+  {
+    "name": "Exploit-DB 漏洞利用库",
+    "url": "https://www.exploit-db.com/",
+    "check_interval": 600,
+    "keywords": ["remote", "local", "web"],
+    "priority": "medium",
+    "tags": ["漏洞利用", "PoC"]
+  },
+  {
+    "name": "GitHub Security Advisories",
+    "url": "https://github.com/advisories",
+    "check_interval": 900,
+    "keywords": ["critical", "high", "CVE-"],
+    "priority": "medium",
+    "tags": ["开源", "安全建议"]
+  },
+  {
+    "name": "绿盟科技安全预警",
+    "url": "http://www.nsfocus.net/vulndb",
+    "check_interval": 600,
+    "keywords": ["高危", "紧急", "预警"],
+    "priority": "high",
+    "tags": ["安全厂商", "预警"]
+  },
+  {
+    "name": "深信服安全通告",
+    "url": "https://www.sangfor.com.cn/service-support/sangfor-security-response-center",
+    "check_interval": 600,
+    "keywords": ["紧急", "高危", "通告"],
+    "priority": "medium",
+    "tags": ["安全厂商", "安全通告"]
+  },
+  {
+    "name": "Microsoft安全更新",
+    "url": "https://msrc.microsoft.com/update-guide/",
+    "check_interval": 86400,
+    "keywords": ["Critical", "Important", "CVE-"],
+    "priority": "high",
+    "tags": ["厂商公告", "微软"]
+  }
+]
