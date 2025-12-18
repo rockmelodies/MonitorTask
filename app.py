@@ -75,8 +75,9 @@ def health_check():
 # ==================== 用户认证 API ====================
 
 @app.route('/api/auth/register', methods=['POST'])
+@admin_required  # 需要管理员权限
 def register():
-    """用户注册"""
+    """用户注册(仅管理员可创建用户)"""
     try:
         data = request.get_json()
         
@@ -95,24 +96,27 @@ def register():
         user = User(
             username=data['username'],
             email=data.get('email'),
-            role='user'  # 默认普通用户
+            role=data.get('role', 'user'),  # 管理员可指定角色
+            email_notify_enabled=data.get('email_notify_enabled', False),
+            wechat_notify_enabled=data.get('wechat_notify_enabled', False),
+            wechat_webhook=data.get('wechat_webhook', '')
         )
         user.set_password(data['password'])
         
         db.session.add(user)
         db.session.commit()
         
-        logger.info(f"用户注册成功: {user.username}")
+        logger.info(f"管理员创建用户成功: {user.username}")
         
         return jsonify({
             'success': True,
-            'message': '注册成功',
+            'message': '创建成功',
             'data': user.to_dict()
         }), 201
     
     except Exception as e:
         db.session.rollback()
-        logger.error(f"用户注册失败: {str(e)}")
+        logger.error(f"创建用户失败: {str(e)}")
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
@@ -210,6 +214,14 @@ def update_user(user_id):
             user.is_active = data['is_active']
         if 'password' in data and data['password']:
             user.set_password(data['password'])
+        
+        # 通知设置
+        if 'email_notify_enabled' in data:
+            user.email_notify_enabled = data['email_notify_enabled']
+        if 'wechat_notify_enabled' in data:
+            user.wechat_notify_enabled = data['wechat_notify_enabled']
+        if 'wechat_webhook' in data:
+            user.wechat_webhook = data['wechat_webhook']
         
         db.session.commit()
         
@@ -501,6 +513,65 @@ def get_stats():
     
     except Exception as e:
         logger.error(f"获取统计信息失败: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+
+@app.route('/api/changes/<int:change_id>', methods=['DELETE'])
+@jwt_required()
+def delete_change(change_id):
+    """删除变化记录"""
+    try:
+        change = ContentChange.query.get_or_404(change_id)
+        
+        db.session.delete(change)
+        db.session.commit()
+        
+        logger.info(f"删除变化记录成功: ID {change_id}")
+        
+        return jsonify({
+            'success': True,
+            'message': '删除成功'
+        })
+    
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"删除变化记录失败: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        }), 500
+
+
+@app.route('/api/changes/batch', methods=['DELETE'])
+@jwt_required()
+def batch_delete_changes():
+    """批量删除变化记录"""
+    try:
+        data = request.get_json()
+        ids = data.get('ids', [])
+        
+        if not ids:
+            return jsonify({
+                'success': False,
+                'message': '请选择要删除的记录'
+            }), 400
+        
+        deleted_count = ContentChange.query.filter(ContentChange.id.in_(ids)).delete(synchronize_session=False)
+        db.session.commit()
+        
+        logger.info(f"批量删除变化记录成功: {deleted_count}条")
+        
+        return jsonify({
+            'success': True,
+            'message': f'成功删除 {deleted_count} 条记录'
+        })
+    
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"批量删除变化记录失败: {str(e)}")
         return jsonify({
             'success': False,
             'message': str(e)

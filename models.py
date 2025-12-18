@@ -114,6 +114,11 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, comment='创建时间')
     last_login = db.Column(db.DateTime, comment='最后登录时间')
     
+    # 通知设置
+    email_notify_enabled = db.Column(db.Boolean, default=False, comment='是否启用邮箱通知')
+    wechat_notify_enabled = db.Column(db.Boolean, default=False, comment='是否启用微信通知')
+    wechat_webhook = db.Column(db.String(500), comment='企业微信Webhook地址')
+    
     def set_password(self, password):
         """设置密码"""
         self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
@@ -131,5 +136,8 @@ class User(db.Model):
             'role': self.role,
             'is_active': self.is_active,
             'created_at': self.created_at.isoformat() if self.created_at else None,
-            'last_login': self.last_login.isoformat() if self.last_login else None
+            'last_login': self.last_login.isoformat() if self.last_login else None,
+            'email_notify_enabled': self.email_notify_enabled,
+            'wechat_notify_enabled': self.wechat_notify_enabled,
+            'wechat_webhook': self.wechat_webhook
         }

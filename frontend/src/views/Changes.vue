@@ -4,14 +4,30 @@
       <template #header>
         <div class="card-header">
           <span>变化记录</span>
-          <el-button @click="fetchChanges">
-            <el-icon><Refresh /></el-icon>
-            刷新
-          </el-button>
+          <div>
+            <el-button 
+              type="danger" 
+              :disabled="selectedIds.length === 0"
+              @click="handleBatchDelete"
+            >
+              <el-icon><Delete /></el-icon>
+              批量删除 ({{ selectedIds.length }})
+            </el-button>
+            <el-button @click="fetchChanges">
+              <el-icon><Refresh /></el-icon>
+              刷新
+            </el-button>
+          </div>
         </div>
       </template>
       
-      <el-table :data="changes" v-loading="loading" stripe>
+      <el-table 
+        :data="changes" 
+        v-loading="loading" 
+        stripe
+        @selection-change="handleSelectionChange"
+      >
+        <el-table-column type="selection" width="55" />
         <el-table-column prop="id" label="ID" width="70" />
         <el-table-column prop="detected_at" label="检测时间" width="180">
           <template #default="{ row }">
@@ -41,6 +57,13 @@
             </el-tag>
           </template>
         </el-table-column>
+        <el-table-column label="操作" width="100" fixed="right">
+          <template #default="{ row }">
+            <el-button type="danger" link size="small" @click="handleDelete(row)">
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
       </el-table>
       
       <el-pagination
@@ -60,10 +83,12 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
 import { getAllChanges } from '@/api/task'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import request from '@/utils/request'
 
 const loading = ref(false)
 const changes = ref<any[]>([])
+const selectedIds = ref<number[]>([])
 
 const pagination = reactive({
   page: 1,
@@ -73,6 +98,10 @@ const pagination = reactive({
 
 const formatTime = (time: string) => {
   return new Date(time).toLocaleString('zh-CN')
+}
+
+const handleSelectionChange = (selection: any[]) => {
+  selectedIds.value = selection.map(item => item.id)
 }
 
 const fetchChanges = async () => {
@@ -86,6 +115,41 @@ const fetchChanges = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const handleDelete = (row: any) => {
+  ElMessageBox.confirm(`确定要删除这条变化记录吗?`, '警告', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    try {
+      await request.delete(`/api/changes/${row.id}`)
+      ElMessage.success('删除成功')
+      fetchChanges()
+    } catch (error) {
+      ElMessage.error('删除失败')
+    }
+  }).catch(() => {})
+}
+
+const handleBatchDelete = () => {
+  ElMessageBox.confirm(`确定要删除选中的 ${selectedIds.value.length} 条记录吗?`, '警告', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(async () => {
+    try {
+      await request.delete('/api/changes/batch', {
+        data: { ids: selectedIds.value }
+      })
+      ElMessage.success('批量删除成功')
+      selectedIds.value = []
+      fetchChanges()
+    } catch (error) {
+      ElMessage.error('批量删除失败')
+    }
+  }).catch(() => {})
 }
 
 onMounted(() => {

@@ -140,6 +140,7 @@ class MonitorScheduler:
             
             # 7. 发送通知
             if task.dingtalk_webhook:
+                logger.info(f"任务 {task.name} 准备发送钉钉通知,Webhook: {task.dingtalk_webhook[:50]}...")
                 self._send_notification(task, change, summary, matched_keywords, vuln_info)
             else:
                 logger.warning(f"任务 {task.name} 未配置钉钉Webhook,跳过通知")
@@ -164,8 +165,10 @@ class MonitorScheduler:
             notifier = create_notifier(task.dingtalk_webhook)
             
             if notifier is None:
-                logger.error(f"任务 {task.name} 钉钉通知器创建失败")
+                logger.error(f"任务 {task.name} 钉钉通知器创建失败,Webhook: {task.dingtalk_webhook}")
                 return
+            
+            logger.info(f"钉钉通知器创建成功,开始发送消息...")
             
             # 构建变化信息
             change_info = {
@@ -175,6 +178,7 @@ class MonitorScheduler:
             
             # 根据是否匹配关键词选择不同的通知方式
             if matched_keywords:
+                logger.info(f"检测到匹配关键词: {matched_keywords},发送漏洞预警")
                 success = notifier.send_vulnerability_alert(
                     task_name=task.name,
                     url=task.url,
@@ -183,11 +187,14 @@ class MonitorScheduler:
                     priority=task.priority
                 )
             else:
+                logger.info("未匹配关键词,发送简单通知")
                 success = notifier.send_simple_alert(
                     task_name=task.name,
                     url=task.url,
                     summary=summary
                 )
+            
+            logger.info(f"钉钉消息发送结果: {'success' if success else 'failed'}")
             
             # 记录通知日志
             log = NotificationLog(

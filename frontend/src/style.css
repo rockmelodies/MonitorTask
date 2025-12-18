@@ -16,6 +16,16 @@ html, body, #app {
   --danger-color: #f56c6c;
 }
 
+/* 暗黑主题适配 */
+html.dark {
+  color-scheme: dark;
+}
+
+html.dark body {
+  background-color: #141414;
+  color: rgba(255, 255, 255, 0.85);
+}
+
 .app-container {
   height: 100%;
   display: flex;
@@ -32,8 +42,44 @@ html, body, #app {
   color: #303133;
 }
 
+html.dark .page-header h1 {
+  color: rgba(255, 255, 255, 0.85);
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+/* 滚动条美化 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--el-fill-color-lighter);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--el-border-color-darker);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--el-border-color-dark);
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #3a3a3a;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #4a4a4a;
 }
